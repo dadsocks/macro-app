@@ -1,0 +1,5 @@
+Users: Create user, update user, get profile, retrieve username, retrieve password, update password
+Macros: Generate Macros, Retrieve Macros, Update Macros
+Weight: Add, Update, delete, read
+Measurements:Add, Update, delete, read
+Macros Consumed: Add, Update, delete, read
