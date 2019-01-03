@@ -56,7 +56,7 @@ const calculateCalories = ({height, weight, age, bodyFatPercentage, sexFactor, a
     calories = (msjEquation({sexFactor, height, weight, age, activity, goal}) + kamcEquation({leanMass,activity,goal}))/2;
   }
 
-  return calories;
+  return Math.round(calories);
 };
 
 const convertToMetricValue = (value, constant) => value * constant;
@@ -76,9 +76,9 @@ const calculateSexFactor = (sex) => {
   return -161;
 };
 
-const calculateCarbohydrates = (calories) => (calories * .4)/4;
-const calculateProtein = (calories) => (calories * .3)/4;
-const calculateFat = (calories) => (calories * .3)/9;
+const calculateCarbohydrates = (calories) => Math.round((calories * .4)/4);
+const calculateProtein = (calories) => Math.round((calories * .3)/4);
+const calculateFat = (calories) => Math.round((calories * .3)/9);
 
 const calculateMacros = ({heightInput, weightInput, age, bodyFatPercentage, sex, activityInput, goalInput}) => {
 
