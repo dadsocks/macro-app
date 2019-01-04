@@ -80,15 +80,17 @@ const calculateCarbohydrates = (calories) => Math.round((calories * .4)/4);
 const calculateProtein = (calories) => Math.round((calories * .3)/4);
 const calculateFat = (calories) => Math.round((calories * .3)/9);
 
-const calculateMacros = ({heightInput, weightInput, age, bodyFatPercentage, sex, activityInput, goalInput}) => {
+const calculateMacros = ({heightInput, weightInput, age, bodyFatPercentageInput, sex, activityInput, goalInput}) => {
 
   const height = convertToMetricValue(heightInput, 2.54);
   const weight = convertToMetricValue(weightInput, 0.45359237);
+  const bodyFatPercentage = bodyFatPercentageInput/100;
   const activity = activityFactor(activityInput);
   const goal = goalAdjustment(goalInput);
   const leanMass = calculateTargetMass({weight, bodyFatPercentage});
   const sexFactor = calculateSexFactor(sex);
   const calories = calculateCalories({height, weight, age, bodyFatPercentage, sexFactor, activity, goal, leanMass});
+
 
   const carbohydrates = calculateCarbohydrates(calories);
   const protein = calculateProtein(calories);
