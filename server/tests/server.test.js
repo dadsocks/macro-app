@@ -59,4 +59,17 @@ describe('GET /macros', () => {
       })
       .end(done);
   });
+
+  it('should not generate macros if entry is invalid', (done) => {
+    request(app)
+      .get('/macros')
+      .send(maleUsers[2])
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.details[0].message).toBe("\"heightInput\" must be a number")
+        expect(res.body.details[1].message).toBe("\"bodyFatPercentageInput\" must be larger than or equal to 0")
+        expect(res.body.details[2].message).toBe("\"sex\" must be one of [Male, Female]")
+      })
+      .end(done);
+  });
 });

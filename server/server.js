@@ -17,7 +17,7 @@ app.get('/macros', (req,res) => {
     return res.send(macronutrients);
   }
 
-  return res.send(result.error);
+  return res.status(400).send(result.error);
 });
 
 app.listen(port, () => {
