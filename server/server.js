@@ -1,23 +1,26 @@
+require('./config/config');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const Joi = require('joi');
 const { calculateMacros } = require('./utils/macroUtils');
 const { macroSchema } = require('./utils/joiSchemas');
 
+const { mongoose } = require('./db/database');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.use(bodyParser.json());
 
 app.get('/macros', (req,res) => {
   const result = Joi.validate(req.body, macroSchema, {abortEarly: false});
-  const macronutrients = calculateMacros(req.body);
 
-  if (result.error === null) {
-    return res.send(macronutrients);
+  if (result.error) {
+    return res.status(400).send(result.error);
   }
 
-  return res.status(400).send(result.error);
+  return res.send(calculateMacros(req.body));
+
 });
 
 app.listen(port, () => {
