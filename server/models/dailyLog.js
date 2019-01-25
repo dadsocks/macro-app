@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const DailyLog = mongoose.model('DailyLog', {
   date: {
-    type: Date,
+    type: String,
     required: true,
     unique: true,
     default: Date.now

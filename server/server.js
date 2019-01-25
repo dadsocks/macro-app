@@ -25,7 +25,7 @@ app.get('/macros', (req,res) => {
 });
 
 app.post('/dailyLog', (req, res) => {
-  const date = new Date(req.body.date);
+  const date = new Date(req.body.date).toString();
 
   const dailyLog = new DailyLog({
       date: date,
