@@ -1,3 +1,7 @@
+
+const config = require('./../../config/config');
+const {DailyLog} = require('./../../models/dailyLog');
+
 const logs = [{
   date: "01/01/2019",
   weight: 210,
@@ -9,6 +13,36 @@ const logs = [{
   carbohydrates: 180,
   fat: 73,
   protein: 173
+},{
+  date: "01/02/2019",
+  weight: 208,
+  waistMeasurement: 34,
+  bodyFatPercentage: 22,
+  sleep: 7,
+  water: 32,
+  dayType: "Rest",
+  carbohydrates: 180,
+  fat: 73,
+  protein: 173
 }];
 
-module.exports = {logs};
+const postLogData = {
+  date: "01/03/2019",
+  weight: 209,
+  waistMeasurement: 34,
+  bodyFatPercentage: 22,
+  sleep: 6,
+  water: 64,
+  dayType: "Work Out",
+  carbohydrates: 180,
+  fat: 73,
+  protein: 173
+}
+
+const populateDailyLogs = (done) => {
+  DailyLog.remove({}).then(() => {
+    return DailyLog.insertMany(logs);
+  }).then(() => done());
+};
+
+module.exports = {logs,populateDailyLogs,postLogData};

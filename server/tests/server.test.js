@@ -3,7 +3,10 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {DailyLog} = require('./../models/dailyLog');
 const {maleUsers, femaleUsers} = require('./seed/macroTestData');
-const {logs} = require('./seed/logTestData');
+const {logs,populateDailyLogs,postLogData} = require('./seed/logTestData');
+
+
+beforeEach(populateDailyLogs);
 
 describe('GET /macros', () => {
   it('should generate macros for a male using the Mifflin-St Jeor Equation', (done) => {
@@ -79,23 +82,23 @@ describe('GET /macros', () => {
 describe('POST /dailyLog', () => {
   it('should create a new daily log', (done) => {
 
-    const date = new Date(logs[0].date).toString();
+    const date = new Date(postLogData.date).toString();
 
     request(app)
       .post('/dailyLog')
-      .send(logs[0])
+      .send(postLogData)
       .expect(200)
       .expect((res) => {
         expect(res.body.date).toBe(date);
-        expect(res.body.weight).toBe(logs[0].weight);
-        expect(res.body.waistMeasurement).toBe(logs[0].waistMeasurement);
-        expect(res.body.bodyFatPercentage).toBe(logs[0].bodyFatPercentage);
-        expect(res.body.sleep).toBe(logs[0].sleep);
-        expect(res.body.water).toBe(logs[0].water);
-        expect(res.body.dayType).toBe(logs[0].dayType);
-        expect(res.body.carbohydrates).toBe(logs[0].carbohydrates);
-        expect(res.body.fat).toBe(logs[0].fat);
-        expect(res.body.protein).toBe(logs[0].protein);
+        expect(res.body.weight).toBe(postLogData.weight);
+        expect(res.body.waistMeasurement).toBe(postLogData.waistMeasurement);
+        expect(res.body.bodyFatPercentage).toBe(postLogData.bodyFatPercentage);
+        expect(res.body.sleep).toBe(postLogData.sleep);
+        expect(res.body.water).toBe(postLogData.water);
+        expect(res.body.dayType).toBe(postLogData.dayType);
+        expect(res.body.carbohydrates).toBe(postLogData.carbohydrates);
+        expect(res.body.fat).toBe(postLogData.fat);
+        expect(res.body.protein).toBe(postLogData.protein);
       })
       .end((err,res) => {
         if (err) {
@@ -122,9 +125,22 @@ describe('POST /dailyLog', () => {
         }
 
         DailyLog.find().then((dailyLogs) => {
-          expect(dailyLogs.length).toBe(1);
+          expect(dailyLogs.length).toBe(2);
           done();
         }).catch((e) => done(e));
       });
+  });
+});
+
+describe('GET /dailyLog', () => {
+  it('should get all daily logs', (done) => {
+
+    request(app)
+      .get('/dailyLog')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.dailyLogs.length).toBe(2);
+      })
+      .end(done);
   });
 });

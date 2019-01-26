@@ -2,6 +2,9 @@ require('./config/config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const {ObjectID} = require('mongodb');
+
 const Joi = require('joi');
 const { calculateMacros } = require('./utils/macroUtils');
 const { macroSchema } = require('./utils/joiSchemas');
@@ -25,6 +28,7 @@ app.get('/macros', (req,res) => {
 });
 
 app.post('/dailyLog', (req, res) => {
+
   const date = new Date(req.body.date).toString();
 
   const dailyLog = new DailyLog({
@@ -43,6 +47,34 @@ app.post('/dailyLog', (req, res) => {
   dailyLog.save().then((log) => {
     res.send(log);
   }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.get('/dailyLog', (req, res) => {
+
+  DailyLog.find().then((dailyLogs) => {
+    res.send({dailyLogs});
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.get('/dailyLog/:id', (req, res) => {
+
+  const id = req.params.id;
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send('ID is not valid');
+  }
+
+  DailyLog.findOne({_id: id}).then((dailyLog) => {
+    if(!dailyLog) {
+      return res.status(404).send('Daily log was not found');
+    }
+
+    res.send({dailyLog});
+  }).catch((e) => {
     res.status(400).send(e);
   });
 });
