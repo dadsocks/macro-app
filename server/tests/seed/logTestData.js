@@ -1,8 +1,9 @@
-
+const {ObjectID} = require('mongodb');
 const config = require('./../../config/config');
 const {DailyLog} = require('./../../models/dailyLog');
 
 const logs = [{
+  _id: new ObjectID(),
   date: "01/01/2019",
   weight: 210,
   waistMeasurement: 34,
@@ -14,6 +15,7 @@ const logs = [{
   fat: 73,
   protein: 173
 },{
+  _id: new ObjectID(),
   date: "01/02/2019",
   weight: 208,
   waistMeasurement: 34,

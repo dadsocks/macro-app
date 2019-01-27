@@ -1,5 +1,6 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {DailyLog} = require('./../models/dailyLog');
 const {maleUsers, femaleUsers} = require('./seed/macroTestData');
@@ -141,6 +142,37 @@ describe('GET /dailyLog', () => {
       .expect((res) => {
         expect(res.body.dailyLogs.length).toBe(2);
       })
+      .end(done);
+  });
+});
+
+describe('GET /dailyLog/:id', () => {
+  it('should return a daily log', (done) => {
+
+    request(app)
+      .get(`/dailyLog/${logs[0]._id.toHexString()}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.dailyLog._id).toBe(logs[0]._id.toHexString());
+        expect(res.body.dailyLog.weight).toBe(logs[0].weight);
+      })
+      .end(done);
+  });
+
+  it('should return 404 if daily log not found', (done) => {
+    const hexID = new ObjectID().toHexString();
+
+    request(app)
+      .get(`/dailyLog/${hexID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for non-object ids', (done) => {
+
+    request(app)
+      .get('/dailyLog/123')
+      .expect(404)
       .end(done);
   });
 });
