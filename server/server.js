@@ -2,6 +2,7 @@ require('./config/config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const _ = require('lodash');
 
 const {ObjectID} = require('mongodb');
 
@@ -52,8 +53,19 @@ app.post('/dailyLog', (req, res) => {
 });
 
 app.get('/dailyLog', (req, res) => {
+  console.log(req.query.date);
 
-  DailyLog.find().then((dailyLogs) => {
+  const date = new Date(req.query.date).toString();
+
+  if(Object.keys(req.query).length === 0) {
+    return DailyLog.find().then((dailyLogs) => {
+      res.send({dailyLogs});
+    }, (e) => {
+      res.status(400).send(e);
+    });
+  }
+
+  DailyLog.find({date}).then((dailyLogs) => {
     res.send({dailyLogs});
   }, (e) => {
     res.status(400).send(e);
@@ -76,6 +88,46 @@ app.get('/dailyLog/:id', (req, res) => {
     res.send({dailyLog});
   }).catch((e) => {
     res.status(400).send(e);
+  });
+});
+
+app.delete('/dailyLog/:id', (req, res) => {
+
+  const id = req.params.id;
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send('ID is not valid');
+  }
+
+  DailyLog.findOneAndDelete({_id: id}).then((dailyLog) => {
+    if(!dailyLog) {
+      return res.status(404).send('Daily log was not found');
+    }
+
+    res.send({dailyLog});
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
+});
+
+app.patch('/dailyLog/:id', (req, res) => {
+  const id = req.params.id;
+  const body = _.pick(req.body, ['weight','waistMeasurement','bodyFatPercentage','sleep','water','dayType','carbohydrates','fat','protein']);
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send('ID is not valid');
+  }
+
+  DailyLog.findOneAndUpdate({_id: id}, {$set: body}, {new: true}).then((dailyLog) => {
+
+    if(!dailyLog) {
+      return res.status(404).send('Daily Log was not found');
+    }
+
+    res.send(dailyLog);
+
+  }).catch((e) => {
+    res.status(400).send();
   });
 });
 

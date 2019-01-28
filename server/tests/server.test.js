@@ -144,6 +144,18 @@ describe('GET /dailyLog', () => {
       })
       .end(done);
   });
+
+  it('it should return a daily log when searching by date', (done) => {
+
+    request(app)
+      .get('/dailyLog')
+      .query({date: '01-01-2019'})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.dailyLogs.length).toBe(1);
+      })
+      .end(done);
+  });
 });
 
 describe('GET /dailyLog/:id', () => {
@@ -172,6 +184,99 @@ describe('GET /dailyLog/:id', () => {
 
     request(app)
       .get('/dailyLog/123')
+      .expect(404)
+      .end(done);
+  });
+});
+
+describe('DELETE /dailyLog/:id', () => {
+  it('should DELETE a dailyLog', (done) => {
+    const hexID = logs[0]._id.toHexString()
+
+    request(app)
+      .delete(`/dailyLog/${hexID}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.dailyLog._id).toBe(hexID);
+      })
+      .end((err, res) => {
+        if(err) {
+          return done(err);
+        }
+
+        DailyLog.findById(hexID).then((dailyLog) => {
+          expect(dailyLog).toBeFalsy();
+          done();
+        }).catch((e) => done(e));
+      });
+    });
+
+    it('should return 404 if DailyLog not found', (done) => {
+      const hexID = new ObjectID().toHexString();
+
+      request(app)
+        .delete(`/dailyLog/${hexID}`)
+        .expect(404)
+        .end(done);
+    });
+
+    it('should return 404 for non-ObjectIDs', (done) => {
+
+      request(app)
+        .delete('/dailyLog/123')
+        .expect(404)
+        .end(done);
+    });
+});
+
+describe('PATCH /dailyLog/:id', () => {
+  it('should update the daily log', (done) => {
+    const hexID = logs[0]._id.toHexString();
+    const body = {
+      weight: 210.4,
+      waistMeasurement: 33.5,
+      bodyFatPercentage: 21.2,
+      sleep: 7,
+      water: 32,
+      dayType: "Rest",
+      carbohydrates: 170,
+      fat: 85,
+      protein: 170
+    };
+
+    request(app)
+      .patch(`/dailyLog/${hexID}`)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+        console.log(res.body);
+        expect(res.body._id).toBe(hexID);
+        expect(res.body.weight).toBe(body.weight);
+        expect(res.body.waistMeasurement).toBe(body.waistMeasurement);
+        expect(res.body.bodyFatPercentage).toBe(body.bodyFatPercentage);
+        expect(res.body.sleep).toBe(body.sleep);
+        expect(res.body.water).toBe(body.water);
+        expect(res.body.dayType).toBe(body.dayType);
+        expect(res.body.carbohydrates).toBe(body.carbohydrates);
+        expect(res.body.fat).toBe(body.fat);
+        expect(res.body.protein).toBe(body.protein);
+      })
+      .end(done);
+  });
+
+  it('should return 404 if DailyLog not found', (done) => {
+    const hexID = new ObjectID().toHexString();
+
+    request(app)
+      .patch(`/dailyLog/${hexID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for non-ObjectIDs', (done) => {
+
+    request(app)
+      .patch('/dailyLog/123')
       .expect(404)
       .end(done);
   });
