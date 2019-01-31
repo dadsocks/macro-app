@@ -10,4 +10,17 @@ const macroSchema = Joi.object().keys({
   goalInput: Joi.string().valid('Cut 1','Cut 2','Cut 3','Maintain','Gain 1','Gain 2','Gain 3').required()
 });
 
-module.exports = {macroSchema};
+const dailyLogSchema = Joi.object().keys({
+  date: Joi.date().required(),
+  weight: Joi.number().required(),
+  waistMeasurement: Joi.number(),
+  bodyFatPercentage: Joi.number(),
+  sleep: Joi.number(),
+  water: Joi.number(),
+  dayType: Joi.string().valid('Rest', 'Workout', 'ReFeed'),
+  carbohydrates: Joi.number().integer(),
+  fat: Joi.number().integer(),
+  protein: Joi.number().integer()
+});
+
+module.exports = {macroSchema, dailyLogSchema};

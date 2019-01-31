@@ -8,7 +8,7 @@ const {ObjectID} = require('mongodb');
 
 const Joi = require('joi');
 const { calculateMacros } = require('./utils/macroUtils');
-const { macroSchema } = require('./utils/joiSchemas');
+const { macroSchema, dailyLogSchema } = require('./utils/joiSchemas');
 const { DailyLog } = require('./models/dailyLog');
 
 const { mongoose } = require('./db/database');
@@ -31,8 +31,7 @@ app.get('/macros', (req,res) => {
 app.post('/dailyLog', (req, res) => {
 
   const date = new Date(req.body.date).toString();
-
-  const dailyLog = new DailyLog({
+  const dailyLogReq = {
       date: date,
       weight: req.body.weight,
       waistMeasurement: req.body.waistMeasurement,
@@ -43,7 +42,14 @@ app.post('/dailyLog', (req, res) => {
       carbohydrates: req.body.carbohydrates,
       fat: req.body.fat,
       protein: req.body.protein
-  });
+  };
+  const result = Joi.validate(dailyLogReq, dailyLogSchema, {abortEarly: false});
+
+  if(result.error) {
+    return res.status(400).send(result.error);
+  }
+
+  const dailyLog = new DailyLog(dailyLogReq);
 
   dailyLog.save().then((log) => {
     res.send(log);
