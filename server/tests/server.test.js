@@ -148,11 +148,12 @@ describe('GET /dailyLog', () => {
   it('it should return a daily log when searching by date', (done) => {
 
     request(app)
-      .get('/dailyLog')
-      .query({date: '01-01-2019'})
+      .get('/dailyLog?date=01-01-2019')
+      // .query({date: "01-01-2019"})
       .expect(200)
       .expect((res) => {
-        expect(res.body.dailyLogs.length).toBe(1);
+        console.log(res.body);
+        expect(res.body.dailyLog.length).toBe(1);
       })
       .end(done);
   });
@@ -249,7 +250,6 @@ describe('PATCH /dailyLog/:id', () => {
       .send(body)
       .expect(200)
       .expect((res) => {
-        console.log(res.body);
         expect(res.body._id).toBe(hexID);
         expect(res.body.weight).toBe(body.weight);
         expect(res.body.waistMeasurement).toBe(body.waistMeasurement);

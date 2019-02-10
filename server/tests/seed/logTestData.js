@@ -4,13 +4,13 @@ const {DailyLog} = require('./../../models/dailyLog');
 
 const logs = [{
   _id: new ObjectID(),
-  date: "01/01/2019",
+  date: new Date("1/1/2019").toString(),
   weight: 210,
   waistMeasurement: 34,
   bodyFatPercentage: 22,
   sleep: 6,
   water: 64,
-  dayType: "Work Out",
+  dayType: "Workout",
   carbohydrates: 180,
   fat: 73,
   protein: 173
@@ -35,7 +35,7 @@ const postLogData = {
   bodyFatPercentage: 22,
   sleep: 6,
   water: 64,
-  dayType: "Work Out",
+  dayType: "Workout",
   carbohydrates: 180,
   fat: 73,
   protein: 173

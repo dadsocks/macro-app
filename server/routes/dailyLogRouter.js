@@ -6,7 +6,6 @@ const { dailyLogSchema } = require('./../utils/joiSchemas');
 const { DailyLog } = require('./../models/dailyLog');
 
 router.get('/', (req, res) => {
-  console.log(req.query.date);
 
   const date = new Date(req.query.date).toString();
 
@@ -18,8 +17,11 @@ router.get('/', (req, res) => {
     });
   }
 
-  DailyLog.find({date}).then((dailyLogs) => {
-    res.send({dailyLogs});
+    console.log(date);
+
+  DailyLog.find({date:date}).then((dailyLog) => {
+    console.log('LLLOOOOOOGGGGG',dailyLog)
+    res.send({dailyLog});
   }, (e) => {
     res.status(400).send(e);
   });
