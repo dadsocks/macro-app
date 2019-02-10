@@ -23,4 +23,16 @@ const dailyLogSchema = Joi.object().keys({
   protein: Joi.number().integer()
 });
 
-module.exports = {macroSchema, dailyLogSchema};
+const dailyLogPatchSchema = Joi.object().keys({
+  weight: Joi.number().required(),
+  waistMeasurement: Joi.number(),
+  bodyFatPercentage: Joi.number(),
+  sleep: Joi.number(),
+  water: Joi.number(),
+  dayType: Joi.string().valid('Rest', 'Workout', 'ReFeed'),
+  carbohydrates: Joi.number().integer(),
+  fat: Joi.number().integer(),
+  protein: Joi.number().integer()
+});
+
+module.exports = {macroSchema, dailyLogSchema, dailyLogPatchSchema};

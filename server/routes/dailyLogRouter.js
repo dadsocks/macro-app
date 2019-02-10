@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const _ = require('lodash');
 const Joi = require('joi');
 const { ObjectID } = require('mongodb');
-const { dailyLogSchema } = require('./../utils/joiSchemas');
+const { dailyLogSchema, dailyLogPatchSchema } = require('./../utils/joiSchemas');
 const { DailyLog } = require('./../models/dailyLog');
 
 router.get('/', (req, res) => {
@@ -94,6 +95,35 @@ router.delete('/:id', (req,res) => {
     res.send({dailyLog});
   }).catch((e) => {
     res.status(400).send(e);
+  });
+});
+
+router.patch('/:id', (req,res) => {
+
+  const id = req.params.id;
+
+  const body = _.pick(req.body, ['weight','waistMeasurement','bodyFatPercentage','sleep','water','dayType','carbohydrates','fat','protein']);
+
+  const result = Joi.validate(body, dailyLogPatchSchema, {abortEarly: false});
+
+  if(result.error) {
+    return res.status(400).send(result.error);
+  }
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(404).send('ID is not valid');
+  }
+
+  DailyLog.findOneAndUpdate({_id: id}, {$set: body}, {new: true}).then((dailyLog) => {
+
+    if(!dailyLog) {
+      return res.status(404).send('Daily Log was not found');
+    }
+
+    res.send(dailyLog);
+
+  }).catch((e) => {
+    res.status(400).send();
   });
 });
 
