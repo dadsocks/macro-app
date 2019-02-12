@@ -18,8 +18,6 @@ router.get('/', (req, res) => {
     });
   }
 
-    console.log(date);
-
   DailyLog.find({date:date}).then((dailyLog) => {
     console.log('LLLOOOOOOGGGGG',dailyLog)
     res.send({dailyLog});

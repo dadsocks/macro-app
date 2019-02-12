@@ -149,7 +149,6 @@ describe('GET /dailyLog', () => {
 
     request(app)
       .get('/dailyLog?date=01-01-2019')
-      // .query({date: "01-01-2019"})
       .expect(200)
       .expect((res) => {
         console.log(res.body);

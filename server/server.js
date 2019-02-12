@@ -2,26 +2,37 @@ require('./config/config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const { calculateMacros } = require('./utils/macroUtils');
 const { mongoose } = require('./db/database');
+const _ = require('lodash');
 const app = express();
 const port = process.env.PORT;
 const dailyLogRouter = require('./routes/dailyLogRouter');
+const macrosRouter = require('./routes/macrosRouter');
+const { User } = require('./models/user');
 
 app.use(bodyParser.json());
 
 app.use('/dailyLog', dailyLogRouter);
+app.use('/macros', macrosRouter);
 
-app.get('/macros', (req,res) => {
-  const result = Joi.validate(req.body, macroSchema, {abortEarly: false});
+app.post('/users', (req, res) => {
 
-  if (result.error) {
-    return res.status(400).send(result.error);
-  }
+  const body = _.pick(req.body,['email', 'password', 'settings', 'macros']);
 
-  return res.send(calculateMacros(req.body));
+  const user = new User(body);
 
+  user.generateAuthToken()
+    .then(() => user.save())
+    .then((dbRes) => {
+
+      const token = dbRes.tokens[0].token;
+      
+      res.header('x-auth', token).send(user);
+    })
+    .catch((e) => res.status(400).send(e));
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server is up on port ${port}`);
