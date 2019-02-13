@@ -10,30 +10,30 @@ const SettingsSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  height: {type: Number},
-  weight: {type: Number},
+  heightInput: {type: Number},
+  weightInput: {type: Number},
   age: {
     type: Number,
     min: 18,
   },
-  bodyFatPercentage: {
+  bodyFatPercentageInput: {
     type: Number,
     max: 100,
   },
   sex: {type: String},
-  activity: {
+  activityInput: {
     type: Number,
     min: 1,
     max: 5
   },
-  goal: {type: String}
+  goalInput: {type: String}
 });
 
 const MacrosSchema = new Schema({
   calories: {type: Number},
   carbohydrates: {type: Number},
-  fat: {type: Number},
-  protein: {type: Number}
+  protein: {type: Number},
+  fat: {type: Number}
 });
 
 const UserSchema = new Schema({
@@ -53,8 +53,8 @@ const UserSchema = new Schema({
     required: true,
     minlength: 6
   },
-  settings: [SettingsSchema],
-  macros: [MacrosSchema],
+  settings: SettingsSchema,
+  macros: MacrosSchema,
   tokens: [{
     access: {
       type: String,

@@ -9,6 +9,7 @@ const port = process.env.PORT;
 const dailyLogRouter = require('./routes/dailyLogRouter');
 const macrosRouter = require('./routes/macrosRouter');
 const { User } = require('./models/user');
+const { calculateMacros } = require('./utils/macroUtils');
 
 app.use(bodyParser.json());
 
@@ -17,16 +18,21 @@ app.use('/macros', macrosRouter);
 
 app.post('/users', (req, res) => {
 
-  const body = _.pick(req.body,['email', 'password', 'settings', 'macros']);
+  const user = new User(req.body);
 
-  const user = new User(body);
+  if(user.settings) {
+    const userInfo = _.omit(req.body.settings ,['_id','startDate']);
+    const userMacros = calculateMacros(userInfo);
+
+    user.macros = userMacros
+  }
 
   user.generateAuthToken()
     .then(() => user.save())
-    .then((dbRes) => {
+    .then((dbResponse) => {
 
-      const token = dbRes.tokens[0].token;
-      
+      const token = dbResponse.tokens[0].token;
+
       res.header('x-auth', token).send(user);
     })
     .catch((e) => res.status(400).send(e));
