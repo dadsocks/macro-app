@@ -19,7 +19,6 @@ router.get('/', (req, res) => {
   }
 
   DailyLog.find({date:date}).then((dailyLog) => {
-    console.log('LLLOOOOOOGGGGG',dailyLog)
     res.send({dailyLog});
   }, (e) => {
     res.status(400).send(e);
@@ -104,9 +103,10 @@ router.patch('/:id', (req,res) => {
 
   const result = Joi.validate(body, dailyLogPatchSchema, {abortEarly: false});
 
-  if(result.error) {
-    return res.status(400).send(result.error);
-  }
+  // if(result.error) {
+  //   console.log(result.error);
+  //   return res.status(400).send(result.error);
+  // }
 
   if(!ObjectID.isValid(id)) {
     return res.status(404).send('ID is not valid');
@@ -116,6 +116,11 @@ router.patch('/:id', (req,res) => {
 
     if(!dailyLog) {
       return res.status(404).send('Daily Log was not found');
+    }
+
+    if(result.error) {
+      console.log(result.error);
+      return res.status(400).send(result.error);
     }
 
     res.send(dailyLog);

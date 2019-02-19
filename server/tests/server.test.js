@@ -4,10 +4,12 @@ const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {DailyLog} = require('./../models/dailyLog');
 const {maleUsers, femaleUsers} = require('./seed/macroTestData');
-const {logs,populateDailyLogs,postLogData} = require('./seed/logTestData');
+const {logs, populateDailyLogs, postLogData} = require('./seed/logTestData');
+const {users, populateUsers} = require('./seed/usersTestData');
 
 
 beforeEach(populateDailyLogs);
+beforeEach(populateUsers);
 
 describe('GET /macros', () => {
   it('should generate macros for a male using the Mifflin-St Jeor Equation', (done) => {
@@ -151,7 +153,6 @@ describe('GET /dailyLog', () => {
       .get('/dailyLog?date=01-01-2019')
       .expect(200)
       .expect((res) => {
-        console.log(res.body);
         expect(res.body.dailyLog.length).toBe(1);
       })
       .end(done);
@@ -277,6 +278,21 @@ describe('PATCH /dailyLog/:id', () => {
     request(app)
       .patch('/dailyLog/123')
       .expect(404)
+      .end(done);
+  });
+});
+
+describe('GET /users/me', () => {
+  it('should return user if authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .set('x-auth',users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+        expect(Object.keys(res.body.settings).length).toBe(9);
+      })
       .end(done);
   });
 });
