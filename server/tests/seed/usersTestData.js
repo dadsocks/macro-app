@@ -6,6 +6,7 @@ const { User } = require('./../../models/user');
 const user1ID = new ObjectID();
 const user2ID = new ObjectID();
 const user3ID = new ObjectID();
+const user4ID = new ObjectID();
 
 const users = [{
   _id: user1ID,
@@ -45,21 +46,30 @@ const users = [{
   }]
 },{
   _id: user3ID,
-  email: 'testxauthnosettings@test.com',
+  email: 'testwithnosettings@test.com',
   password: 'user3pass',
-  tokens: [{
-    access: 'auth',
-    token: jwt.sign({_id: user1ID, access: 'auth'}, 'abc123').toString()
-  }]
+},{
+  _id: user4ID,
+  email: 'testwithsettings@test.com',
+  password: 'user4pass',
+  settings: {
+    startDate: '01/01/2019',
+    heightInput: 63,
+    weightInput: 110,
+    age: 26,
+    bodyFatPercentageInput: 16,
+    sex: 'Female',
+    activityInput: 3,
+    goalInput: 'Cut 1'
+  }
 }];
 
 const populateUsers = (done) => {
   User.remove({}).then(() => {
     const user1 = new User(users[0]).save();
     const user2 = new User(users[1]).save();
-    const user3 = new User(users[2]).save();
 
-    return Promise.all([user1, user2, user3]);
+    return Promise.all([user1, user2]);
   }).then(() => done());
 };
 

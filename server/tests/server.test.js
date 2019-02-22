@@ -3,6 +3,7 @@ const request = require('supertest');
 const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {DailyLog} = require('./../models/dailyLog');
+const {User} = require('./../models/user');
 const {maleUsers, femaleUsers} = require('./seed/macroTestData');
 const {logs, populateDailyLogs, postLogData} = require('./seed/logTestData');
 const {users, populateUsers} = require('./seed/usersTestData');
@@ -294,5 +295,95 @@ describe('GET /users/me', () => {
         expect(Object.keys(res.body.settings).length).toBe(9);
       })
       .end(done);
+  });
+
+  it('should return 401 if not authorized', (done) => {
+    request(app)
+      .get('/users/me')
+      .expect(401)
+      .expect((res) => {
+        expect(res.body).toEqual({});
+      })
+      .end(done);
+  });
+});
+
+describe('POST /users', () => {
+  it('should create a user', (done) => {
+    const email = users[3].email;
+    const password = users[3].password;
+    request(app)
+      .post('/users')
+      .send(users[3])
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toBeTruthy();
+        expect(res.body._id).toBeTruthy();
+        expect(res.body.email).toBe(users[3].email);
+      })
+      .end((err) => {
+        if(err) {
+          return done(err);
+        }
+
+        User.findOne({email}).then((user) => {
+          expect(user).toBeTruthy();
+          expect(user.password).not.toEqual(password);
+          expect(user.macros).toBeTruthy();
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+  it('should return validation errors if email is invalid', (done) => {
+    request(app)
+      .post('/users')
+      .send({
+        email: 'fakeemail',
+        password:'abc123'
+      })
+      .expect(400)
+      .end(done);
+  });
+
+  it('should return validation errors if settings are invalid', (done) => {
+    request(app)
+      .post('/users')
+      .send({
+        email: 'testwithsettings@test.com',
+        password: 'user4pass',
+        settings: {
+          startDate: '01/01/2019',
+          heightInput: "So Tall",
+          weightInput: "So Heavy",
+          age: 26,
+          bodyFatPercentageInput: 16,
+          sex: 'Female',
+          activityInput: 3,
+          goalInput: 'Cut 1'
+        }
+      })
+      .expect(400)
+      .end(done);
+  });
+
+  it('should not create a user if email in use', (done) => {
+    request(app)
+      .post('/users')
+      .send({
+        email: 'testxauthwithsettings@test.com',
+        password: 'abc123'
+      })
+      .expect(400)
+      .end((err, res) => {
+        if(err) {
+          return done(err);
+        }
+
+        User.find().then((users) => {
+          expect(users.length).toBe(2);
+          done();
+        }).catch((e) => done(e));
+      });
   });
 });
