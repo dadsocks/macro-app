@@ -49,7 +49,10 @@ app.post('/users/login', (req, res) => {
   const body = _.pick(req.body, ['email', 'password']);
 
   User.findByCredentials(body.email, body.password).then((user) => {
-    return user.generateAuthToken().then((token) => {
+    return user.generateAuthToken()
+    .then(() => user.save())
+    .then((response) => {
+      const token = response.tokens[1].token;
       res.header('x-auth', token).send(user);
     });
   }).catch((e) => {
